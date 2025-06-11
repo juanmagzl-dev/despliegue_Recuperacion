@@ -6,9 +6,9 @@ use Exception;
 use SimpleXMLElement;
 
 class MinesweeperMap {
-    private $rows;
-    private $cols;
-    private $mines;
+    public $rows;
+    public $cols;
+    public $mines;
     private $map;
     
     public function __construct($rows, $cols, $mines) {

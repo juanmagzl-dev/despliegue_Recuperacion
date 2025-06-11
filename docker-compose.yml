@@ -1,0 +1,36 @@
+services:
+  minesweeper-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: minesweeper-apache-server
+    ports:
+      - "8080:8080"   # HTTP port
+      - "8443:8443"   # HTTPS port
+    volumes:
+      # Optional: Mount logs for debugging
+      - apache-logs:/var/log/apache2
+      # Optional: Mount SSL certificates from host (uncomment if using custom certificates)
+      # - ./ssl-certs:/etc/ssl/certs
+      # - ./ssl-private:/etc/ssl/private
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+      - APACHE_LOG_DIR=/var/log/apache2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - minesweeper-network
+
+volumes:
+  apache-logs:
+    driver: local
+
+networks:
+  minesweeper-network:
+    driver: bridge 

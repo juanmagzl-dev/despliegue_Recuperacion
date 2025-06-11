@@ -1,265 +1,278 @@
-# 🎯 Buscaminas Generator
+# 🎮 Minesweeper Map Generator
 
-Generador de mapas de buscaminas con diferentes niveles de dificultad. Proyecto desarrollado en PHP con interfaz web moderna.
+**Generador de Mapas de Buscaminas con Docker y Apache HTTPS**
 
-## 📋 ¿En qué consiste la aplicación?
+## 📋 Descripción del Proyecto
 
-Esta aplicación permite:
+Aplicación web desarrollada en PHP que permite generar, visualizar y gestionar mapas del juego Buscaminas. La aplicación está completamente dockerizada y desplegada usando Apache con HTTPS y autenticación de usuarios.
 
-- **Generar mapas de buscaminas** con diferentes niveles de dificultad
-- **Visualizar mapas** con interfaz web moderna usando CSS Grid
-- **Guardar y cargar mapas** en formato JSON/XML
-- **Configurar parámetros personalizados** para mapas custom
-- **Validar y probar** toda la funcionalidad con tests automatizados
+## 🏗️ Arquitectura Técnica
 
-### 🎮 Niveles de dificultad disponibles:
-- **Fácil**: 9x9 con 10 minas
-- **Medio**: 16x16 con 40 minas  
-- **Experto**: 30x16 con 99 minas
-- **Personalizado**: Define tus propios parámetros
+### **Stack Tecnológico:**
+- **Backend**: PHP 8.2 con Apache
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Servidor Web**: Apache 2.4 con SSL/TLS
+- **Contenedorización**: Docker
+- **Autenticación**: Apache Basic Auth
 
-## 🏗️ Estructura del proyecto
-
+### **Estructura del Proyecto:**
 ```
-/
-├── src/
-│   ├── backend/
-│   │   ├── MinesweeperMap.php    # Clase principal
-│   │   └── api.php               # API REST original
-│   └── frontend/
-│       ├── index.html            # Interfaz web principal
-│       ├── test.html             # Página de tests interactivos
-│       ├── api.php               # API REST para servidor built-in
-│       ├── styles.css            # Estilos (CSS Grid)
-│       └── script.js             # JavaScript principal
-├── tests/
-│   ├── MinesweeperMapTest.php    # Tests PHPUnit completos
-│   └── run_tests.php             # Runner de tests personalizados
-├── test_basic.php                # Tests básicos y rápidos
-├── simple_test.php               # Tests alternativos
-├── composer.json                 # Dependencias PHP
-├── phpunit.xml                   # Configuración PHPUnit
-├── GIT_SETUP.md                  # Guía para configurar Git
-└── README.md                     # Este archivo
+├── Dockerfile                 # Imagen Docker principal
+├── docker-compose.yml        # Orquestación (opcional)
+├── apache-config/            # Configuración Apache
+│   └── 000-default-ssl.conf  # VirtualHost HTTPS
+├── src/                      # Código fuente
+│   ├── frontend/            # HTML, CSS, JS
+│   └── backend/             # PHP, API
+└── README.md                # Este archivo
 ```
 
-## ⚡ Quick Start
+## 🐳 Configuración Docker
 
+### **Base de la Imagen:**
+```dockerfile
+FROM php:8.2-apache
+```
+
+### **Componentes Instalados:**
+- **SSL Certificate**: Certificado auto-firmado para desarrollo
+- **Apache Modules**: ssl, rewrite, headers, expires, deflate, auth_basic
+- **PHP Extensions**: Configuración personalizada
+- **Usuarios**: Sistema de autenticación con grupos
+
+### **Puertos Expuestos:**
+- **8080**: HTTP (redirige a HTTPS)
+- **8443**: HTTPS (principal)
+
+### **Características del Dockerfile:**
+- **Multi-stage build**: Optimizado para producción
+- **SSL auto-firmado**: Generado automáticamente para desarrollo
+- **Usuarios pre-configurados**: Sistema de autenticación listo
+- **Módulos Apache**: Habilitados automáticamente (ssl, rewrite, headers)
+- **Permisos**: Configurados correctamente para www-data
+- **Health check**: Monitoreo automático del estado del contenedor
+
+## 🔧 Configuración Apache
+
+### **Virtual Hosts:**
+```apache
+# HTTPS (Principal)
+<VirtualHost *:8443>
+    ServerName www.minesweepermapgenerator.com
+    ServerAlias www.minesweepermapgenerator.es
+    DocumentRoot /var/www/https
+    SSLEngine on
+</VirtualHost>
+
+# HTTP (Redirección)
+<VirtualHost *:8080>
+    # Redirige automáticamente a HTTPS
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</VirtualHost>
+```
+
+### **Características de Seguridad:**
+- ✅ **HTTPS Obligatorio**: Redirección automática HTTP → HTTPS
+- ✅ **Headers de Seguridad**: HSTS, X-Frame-Options, X-XSS-Protection
+- ✅ **Indexado Deshabilitado**: `Options -Indexes`
+- ✅ **Tokens de Servidor Ocultos**: `ServerTokens Prod`
+
+### **Autenticación:**
+- **Tipo**: Basic Authentication
+- **Usuarios**: `mapuser1`, `mapuser2`
+- **Contraseña**: `password`
+- **Grupo**: `mapgenerators`
+
+## 🚀 Instalación y Uso
+
+### **1. Clonar el Repositorio:**
 ```bash
-# 1. Clonar y entrar al proyecto
-git clone <url-del-repo>
+git clone <repository-url>
 cd despliegue_recuperacion
-
-# 2. Iniciar servidor (elige una opción)
-php -S localhost:8080 -t src/frontend
-# O si hay problemas:
-php -S 127.0.0.1:8000 -t src/frontend
-
-# 3. Abrir navegador
-# http://localhost:8080/index.html  (aplicación)
-# http://localhost:8080/test.html   (tests)
-# O con puerto 8000:
-# http://127.0.0.1:8000/index.html
-
-# 4. Ejecutar tests en terminal
-php test_basic.php
 ```
 
-## 🚀 Instalación completa
-
-### Requisitos previos
-- PHP 7.4 o superior
-- Servidor web (Apache/Nginx) o PHP built-in server
-- Composer (opcional, para PHPUnit)
-
-### Instalación paso a paso
-
-1. **Clona el repositorio**
-   ```bash
-   git clone <url-del-repo>
-   cd despliegue_recuperacion
-   ```
-
-2. **Instala dependencias (opcional)**
-   ```bash
-   composer install
-   ```
-
-3. **Inicia el servidor web**
-   
-   **Opción A - Servidor PHP built-in (Recomendado):**
-   ```bash
-   # Opción principal
-   php -S localhost:8080 -t src/frontend
-   
-   # Si hay problemas de conexión, prueba:
-   php -S 127.0.0.1:8000 -t src/frontend
-   
-   # O con IP diferente:
-   php -S 0.0.0.0:8000 -t src/frontend
-   ```
-   
-   **Opción B - Servidor web tradicional:**
-   - Coloca los archivos en tu servidor web (Apache/Nginx)
-   - Accede a `src/frontend/index.html`
-
-4. **Accede a la aplicación**
-   ```
-   🎮 Aplicación principal: 
-   http://localhost:8080/index.html
-   
-   🧪 Tests interactivos:
-   http://localhost:8080/test.html
-   
-   📱 Si usas puerto 8000:
-   http://127.0.0.1:8000/index.html
-   ```
-
-## 🧪 Cómo lanzar los tests
-
-Tienes **4 formas diferentes** de ejecutar tests, desde la más simple hasta la más completa:
-
-### 🚀 Opción 1: Test básico (Más fácil)
+### **2. Construir la Imagen Docker:**
 ```bash
-php test_basic.php
+docker build -t minesweeper-app .
 ```
-**Qué hace:** Verifica funcionalidad básica, generación de mapas y serialización JSON.
 
-### 🌐 Opción 2: Tests en navegador (Más visual)
-1. Asegúrate de que el servidor esté corriendo:
-   ```bash
-   php -S localhost:8080 -t src/frontend
-   # O si hay problemas: php -S 127.0.0.1:8000 -t src/frontend
-   ```
-2. Abre: `http://localhost:8080/test.html` (o `http://127.0.0.1:8000/test.html`)
-3. Haz clic en los botones de test
-
-**Qué hace:** Tests interactivos con resultados en tiempo real y interfaz visual.
-
-### 🔬 Opción 3: Tests completos (Más detallado)
+### **3. Ejecutar el Contenedor:**
 ```bash
-php tests/run_tests.php
+docker run -d -p 8081:8080 -p 8444:8443 --name minesweeper-app minesweeper-app
 ```
-**Qué hace:** 12 tests completos con estadísticas de cobertura y resultados detallados.
 
-### ⚡ Opción 4: PHPUnit (Más profesional)
+### **4. Acceder a la Aplicación:**
+- **URL Principal**: https://localhost:8444
+- **Alternativa HTTP**: http://localhost:8081 (redirige a HTTPS)
+
+⚠️ **Nota**: Aceptar el certificado SSL auto-firmado en el navegador.
+
+## 🎯 Funcionalidades
+
+### **🌐 Funcionalidades Públicas (Sin Autenticación):**
+- ✅ **Generar Mapas**: Crear mapas con diferentes dificultades
+  - Fácil: 9x9, 10 minas
+  - Medio: 16x16, 40 minas
+  - Experto: 30x16, 99 minas
+  - Personalizado: Dimensiones y minas configurables
+- ✅ **Visualizar Mapas**: Interfaz gráfica con números y minas
+- ✅ **Descargar Localmente**: Exportar mapas como archivos JSON
+- ✅ **Cargar Archivos Locales**: Importar mapas desde el ordenador
+
+### **🔐 Funcionalidades Protegidas (Requieren Autenticación):**
+- 🔐 **Guardar en Servidor**: Almacenar mapas en el servidor
+- 🔐 **Cargar desde Servidor**: Recuperar mapas guardados
+- 🔐 **Subir al Servidor**: Upload de archivos de mapas
+
+### **Credenciales de Acceso:**
+```
+Usuario: mapuser1
+Contraseña: password
+
+Usuario: mapuser2
+Contraseña: password
+```
+
+## 🏃‍♂️ Scripts de Automatización
+
+### **build.sh** - Construcción Automática:
 ```bash
-# Instalar dependencias
-composer install
-
-# Ejecutar tests PHPUnit
-vendor/bin/phpunit
-
-# Tests con cobertura HTML
-vendor/bin/phpunit --coverage-html coverage
+#!/bin/bash
+docker build -t minesweeper-app .
+docker run -d -p 8081:8080 -p 8444:8443 --name minesweeper-app minesweeper-app
 ```
-**Qué hace:** Tests profesionales con cobertura de código y reporting HTML.
 
-### 📊 Cobertura de tests
+### **docker-compose.yml** - Orquestación:
+```yaml
+version: '3.8'
+services:
+  minesweeper:
+    build: .
+    ports:
+      - "8081:8080"
+      - "8444:8443"
+    container_name: minesweeper-app
+```
 
-Todos los tests cubren:
-- ✅ **Generación de mapas** (easy, medium, expert, custom)
-- ✅ **Colocación de minas** aleatoria y validación
-- ✅ **Cálculo de números** adyacentes a minas
-- ✅ **Validación de parámetros** y manejo de errores
-- ✅ **Serialización JSON/XML** completa
-- ✅ **Guardado y carga de archivos** 
-- ✅ **Manejo de excepciones** y casos edge
-- ✅ **API REST** y comunicación frontend-backend
+## 🔍 Verificación y Testing
 
-**Cobertura lograda**: ~85% | **Objetivo**: 80-90% ✅
+### **Verificar Estado del Contenedor:**
+```bash
+# Ver contenedores en ejecución
+docker ps
 
-### 🎯 Tests disponibles por archivo
+# Ver logs del contenedor
+docker logs minesweeper-app
 
-| Archivo | Descripción | Comando |
-|---------|------------|---------|
-| `test_basic.php` | Tests esenciales y rápidos | `php test_basic.php` |
-| `src/frontend/test.html` | Tests visuales en navegador | Abrir en navegador |
-| `tests/run_tests.php` | Tests completos con estadísticas | `php tests/run_tests.php` |
-| `tests/MinesweeperMapTest.php` | Tests PHPUnit profesionales | `vendor/bin/phpunit` |
+# Ver logs en tiempo real
+docker logs -f minesweeper-app
 
-### 🚨 Troubleshooting
+# Inspeccionar el contenedor
+docker inspect minesweeper-app
 
-**Si el servidor no funciona:**
-1. **Error "connection closed" o "SSL request":**
-   - Usa `http://` (NO `https://`)
-   - Prueba `localhost` en lugar de `127.0.0.1`
-   - Ejemplo: `http://localhost:8080/test.html`
+# Entrar al contenedor
+docker exec -it minesweeper-app bash
+```
 
-2. **Puerto ocupado:**
-   ```bash
-   # Cambiar puerto
-   php -S localhost:3000 -t src/frontend
-   php -S localhost:9000 -t src/frontend
-   ```
+### **Verificar Configuración Apache:**
+```bash
+docker exec minesweeper-app apache2ctl -S
+docker exec minesweeper-app apache2ctl -t
+```
 
-3. **Problemas de DNS/localhost:**
-   ```bash
-   # Usar IP directa
-   php -S 127.0.0.1:8000 -t src/frontend
-   php -S 0.0.0.0:8080 -t src/frontend
-   ```
+### **Probar Funcionalidades:**
+```bash
+# Generar mapa (público)
+curl -k -X POST -d "action=generate&difficulty=easy" https://localhost:8444/api/api.php
 
-**Si los tests fallan:**
-1. Verifica que PHP esté instalado: `php --version`
-2. Verifica que estés en el directorio correcto
-3. Para tests en navegador, asegúrate de que el servidor esté corriendo
-4. Para PHPUnit, instala dependencias con `composer install`
+# Guardar mapa (requiere auth)
+curl -k -u mapuser1:password -X POST -d "action=save&mapData={}" https://localhost:8444/api/api.php
+```
 
-**URLs que funcionan:**
-- ✅ `http://localhost:8080/index.html`
-- ✅ `http://localhost:8080/test.html`
-- ❌ `https://localhost:8080` (NO usar HTTPS)
-- ❌ `localhost:8080` (Falta http://)
+## 📊 Estructura de la API
 
-## 🌟 Características técnicas
+### **Endpoint Principal:**
+```
+POST /api/api.php
+```
 
-### Backend (PHP)
-- Clase `MinesweeperMap` con patrón de diseño limpio
-- API REST para comunicación con frontend
-- Serialización en JSON y XML
-- Validación robusta de parámetros
-- Manejo de errores y excepciones
+### **Acciones Disponibles:**
 
-### Frontend (HTML/CSS/JS)
-- Interfaz moderna y responsive
-- CSS Grid para visualización de mapas
-- JavaScript ES6+ con classes
-- Manejo de archivos (subida/descarga)
-- Animaciones y feedback visual
+| Acción | Autenticación | Descripción |
+|--------|---------------|-------------|
+| `generate` | ❌ No | Generar nuevo mapa |
+| `save` | ✅ Sí | Guardar mapa en servidor |
+| `load` | ✅ Sí | Cargar mapa desde servidor |
+| `upload` | ✅ Sí | Subir archivo al servidor |
 
-### Testing
-- Tests unitarios completos
-- Cobertura de casos edge
-- Validación de funcionalidad
-- Tests de integración
+### **Ejemplo de Respuesta:**
+```json
+{
+  "success": true,
+  "map": [[0,1,-1], [1,2,1], [0,0,0]],
+  "rows": 3,
+  "cols": 3,
+  "json": "{\"rows\":3,\"cols\":3,\"mines\":1,\"map\":[[0,1,-1],[1,2,1],[0,0,0]]}"
+}
+```
 
-## 🔧 Tecnologías utilizadas
+## 🛠️ Troubleshooting
 
-- **Backend**: PHP 7.4+, SimpleXML
-- **Frontend**: HTML5, CSS3 (Grid), JavaScript ES6+
-- **Testing**: PHPUnit 9.0+, tests personalizados
-- **Herramientas**: Composer, Git
+### **Problema: Error "Unexpected end of JSON input"**
+- **Causa**: Problema de conectividad con la API
+- **Solución**: Verificar que el contenedor esté ejecutándose
 
-## 📦 Funcionalidades implementadas
+### **Problema: Certificado SSL no confiable**
+- **Causa**: Certificado auto-firmado
+- **Solución**: Aceptar el certificado en el navegador
 
-- [x] Generación aleatoria de mapas
-- [x] Múltiples niveles de dificultad
-- [x] Modo personalizado
-- [x] Visualización con símbolos (💣, números)
-- [x] Guardado/carga de mapas
-- [x] API REST completa
-- [x] Interfaz responsive
-- [x] Tests automatizados
-- [x] Validación de entrada
-- [x] Manejo de errores
+### **Problema: Autenticación falla**
+- **Causa**: Credenciales incorrectas
+- **Solución**: Usar `mapuser1` o `mapuser2` con contraseña `password`
 
-## 🚀 Deployment
+### **Problema: Puerto ocupado**
+- **Causa**: Otro servicio usando el puerto
+- **Solución**: 
+```bash
+# Cambiar puertos
+docker run -d -p 8082:8080 -p 8445:8443 --name minesweeper-app minesweeper-app
+```
 
-Para producción:
-1. Subir archivos al servidor web
-2. Configurar permisos de escritura en directorio `maps/`
-3. Asegurar que PHP esté habilitado
-4. Configurar virtual host apuntando a `src/frontend/`
+## ⚡ Optimización y Rendimiento
+
+### **Configuraciones de Rendimiento:**
+- **Compresión**: Módulo deflate habilitado para archivos estáticos
+- **Caché**: Headers de expiración configurados
+- **Seguridad**: Headers de seguridad (HSTS, XSS Protection)
+- **PHP**: Configuración optimizada para producción
+- **Apache**: Configuración de memoria y procesos optimizada
+
+### **Monitoreo:**
+- **Health Check**: Verificación automática cada 30 segundos
+- **Logs**: Archivos de log separados por VirtualHost
+- **Métricas**: Acceso a estadísticas de Apache via mod_status
+
+## 📋 Requisitos Cumplidos
+
+✅ **HTTPS Obligatorio**: Redirección automática HTTP → HTTPS  
+✅ **Indexado Deshabilitado**: `Options -Indexes`  
+✅ **Autenticación por Grupos**: Sistema de usuarios y grupos  
+✅ **Dominio Configurado**: `www.minesweepermapgenerator.com`  
+✅ **Raíz Correcta**: `/var/www/https`  
+✅ **Sin XAMPP**: Apache oficial Docker  
+✅ **Dockerizado**: Imagen funcional en puerto 8080  
+
+## 👥 Contribución
+
+Para contribuir al proyecto:
+1. Fork del repositorio
+2. Crear rama feature: `git checkout -b feature/nueva-funcionalidad`
+3. Commit cambios: `git commit -m 'Añadir nueva funcionalidad'`
+4. Push a la rama: `git push origin feature/nueva-funcionalidad`
+5. Crear Pull Request
+
+## 🎯 Autor
+
+**Juan Manuel** - Proyecto de Despliegue de Aplicaciones Web
 
 ---

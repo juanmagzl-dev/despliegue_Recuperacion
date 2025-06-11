@@ -1,5 +1,9 @@
 <?php
-require_once '../../vendor/autoload.php';
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'MinesweeperMap.php';
 use Minesweeper\MinesweeperMap;
 
 header('Content-Type: application/json');
@@ -13,7 +17,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
+// Function to check if user is authenticated for protected actions
+function requireAuthentication($action) {
+    $protectedActions = ['save', 'load', 'upload'];
+    
+    if (in_array($action, $protectedActions)) {
+        // Check if Apache authentication was successful
+        if (!isset($_SERVER['PHP_AUTH_USER']) && !isset($_SERVER['REMOTE_USER'])) {
+            // Try to get authentication headers
+            $headers = apache_request_headers();
+            if (!isset($headers['Authorization'])) {
+                http_response_code(401);
+                header('WWW-Authenticate: Basic realm="Minesweeper Map Generator - Authorized Users Only"');
+                throw new Exception('Autenticación requerida para esta funcionalidad');
+            }
+        }
+    }
+}
+
 try {
+    // Check authentication for protected actions
+    requireAuthentication($action);
     switch ($action) {
         case 'generate':
             $difficulty = $_POST['difficulty'] ?? '';
@@ -35,8 +59,8 @@ try {
             echo json_encode([
                 'success' => true,
                 'map' => $map->getMap(),
-                'rows' => $map->rows ?? ($difficulty === 'easy' ? 9 : ($difficulty === 'medium' ? 16 : 30)),
-                'cols' => $map->cols ?? ($difficulty === 'easy' ? 9 : ($difficulty === 'medium' ? 16 : 16)),
+                'rows' => $map->rows,
+                'cols' => $map->cols,
                 'json' => $map->toJson()
             ]);
             break;
@@ -90,6 +114,21 @@ try {
 } catch (Exception $e) {
     echo json_encode([
         'success' => false,
-        'error' => $e->getMessage()
+        'error' => $e->getMessage(),
+        'debug_info' => [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]
+    ]);
+} catch (Error $e) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error fatal: ' . $e->getMessage(),
+        'debug_info' => [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]
     ]);
 } 

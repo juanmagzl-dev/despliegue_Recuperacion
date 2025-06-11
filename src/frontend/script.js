@@ -59,7 +59,7 @@ class MinesweeperUI {
                 formData.append('mines', mines);
             }
             
-            const response = await fetch('api.php', {
+            const response = await fetch('api/api.php', {
                 method: 'POST',
                 body: formData
             });

@@ -1,5 +1,5 @@
 <?php
-require_once '../backend/MinesweeperMap.php';
+require_once 'backend/MinesweeperMap.php';
 use Minesweeper\MinesweeperMap;
 
 header('Content-Type: application/json');
