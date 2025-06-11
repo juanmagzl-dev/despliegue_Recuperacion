@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Buscaminas</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            background: #f0f0f0;
+        }
+        .test-box { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #result { 
+            background: #e9ecef; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🧪 Test del Servidor Buscaminas</h1>
+        <p>Esta página verifica que todo funciona correctamente.</p>
+        
+        <button onclick="testServer()">🔧 Test Servidor</button>
+        <button onclick="testEasyMap()">🟢 Test Mapa Fácil</button>
+        <button onclick="testCustomMap()">⚙️ Test Mapa Custom</button>
+        <button onclick="clearResults()">🗑️ Limpiar</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>📋 Enlaces</h2>
+        <p><a href="index.html" style="color: #007bff;">🎮 Ir a la aplicación principal</a></p>
+        <p><a href="api.php?action=test" style="color: #007bff;">🔗 Test directo del API</a></p>
+    </div>
+
+    <script>
+        function log(message) {
+            const result = document.getElementById('result');
+            result.innerHTML += new Date().toLocaleTimeString() + ' - ' + message + '<br>';
+            result.scrollTop = result.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        async function testServer() {
+            log('🔧 Iniciando test del servidor...');
+            
+            try {
+                const response = await fetch('api.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        action: 'generate',
+                        difficulty: 'easy'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        log('✅ Servidor funcionando correctamente');
+                        log('📊 Mapa generado: ' + data.rows + 'x' + data.cols);
+                    } else {
+                        log('❌ Error del servidor: ' + data.error);
+                    }
+                } else {
+                    log('❌ Error HTTP: ' + response.status);
+                }
+            } catch (error) {
+                log('❌ Error de conexión: ' + error.message);
+            }
+        }
+
+        async function testEasyMap() {
+            log('🟢 Generando mapa fácil...');
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'generate');
+                formData.append('difficulty', 'easy');
+                
+                const response = await fetch('api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('✅ Mapa fácil generado: ' + data.rows + 'x' + data.cols);
+                    log('💣 Minas encontradas: ' + countMines(data.map));
+                } else {
+                    log('❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+            }
+        }
+
+        async function testCustomMap() {
+            log('⚙️ Generando mapa custom (5x5, 3 minas)...');
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'generate');
+                formData.append('difficulty', 'custom');
+                formData.append('rows', '5');
+                formData.append('cols', '5');
+                formData.append('mines', '3');
+                
+                const response = await fetch('api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('✅ Mapa custom generado: ' + data.rows + 'x' + data.cols);
+                    log('💣 Minas encontradas: ' + countMines(data.map));
+                } else {
+                    log('❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+            }
+        }
+
+        function countMines(map) {
+            let count = 0;
+            for (let row of map) {
+                for (let cell of row) {
+                    if (cell === -1) count++;
+                }
+            }
+            return count;
+        }
+
+        // Test inicial automático
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Página de test cargada');
+            log('🌐 Servidor en: ' + window.location.origin);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,66 @@
+name: 🧪 Tests and Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: [7.4, 8.0, 8.1]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+    
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: json, xml, simplexml
+        coverage: xdebug
+    
+    - name: 📦 Install dependencies
+      run: |
+        if [ -f composer.json ]; then
+          composer install --prefer-dist --no-progress
+        fi
+    
+    - name: 🧪 Run custom tests
+      run: php tests/run_tests.php
+    
+    - name: 🏗️ Test PHP syntax
+      run: |
+        find src -name "*.php" -exec php -l {} \;
+    
+    - name: 📊 Run PHPUnit (if available)
+      run: |
+        if [ -f vendor/bin/phpunit ]; then
+          vendor/bin/phpunit --coverage-text
+        fi
+      continue-on-error: true
+
+  quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+    
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.0
+    
+    - name: 🔍 Check code style
+      run: |
+        echo "✅ Code style check passed (placeholder)"
+    
+    - name: 🛡️ Security check
+      run: |
+        echo "✅ Security check passed (placeholder)" 

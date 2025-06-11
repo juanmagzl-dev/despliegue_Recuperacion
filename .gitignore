@@ -1,0 +1,35 @@
+# Archivos de configuración
+.env
+.env.local
+
+# Archivos de dependencias
+vendor/
+node_modules/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de log
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de salida
+*.out
+
+# Archivos de mapas generados
+src/frontend/maps/
+*.json
+
+# Cache de PHPUnit
+.phpunit.cache/
+.phpunit.result.cache 
