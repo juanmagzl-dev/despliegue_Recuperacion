@@ -51,15 +51,15 @@ git clone <url-del-repo>
 cd despliegue_recuperacion
 
 # 2. Iniciar servidor (elige una opción)
-php -S 127.0.0.1:8000 -t src/frontend
-# O si hay problemas:
 php -S localhost:8080 -t src/frontend
+# O si hay problemas:
+php -S 127.0.0.1:8000 -t src/frontend
 
 # 3. Abrir navegador
-# http://127.0.0.1:8000/index.html  (aplicación)
-# http://127.0.0.1:8000/test.html   (tests)
-# O con puerto 8080:
-# http://localhost:8080/index.html
+# http://localhost:8080/index.html  (aplicación)
+# http://localhost:8080/test.html   (tests)
+# O con puerto 8000:
+# http://127.0.0.1:8000/index.html
 
 # 4. Ejecutar tests en terminal
 php test_basic.php
@@ -90,10 +90,10 @@ php test_basic.php
    **Opción A - Servidor PHP built-in (Recomendado):**
    ```bash
    # Opción principal
-   php -S 127.0.0.1:8000 -t src/frontend
+   php -S localhost:8080 -t src/frontend
    
    # Si hay problemas de conexión, prueba:
-   php -S localhost:8080 -t src/frontend
+   php -S 127.0.0.1:8000 -t src/frontend
    
    # O con IP diferente:
    php -S 0.0.0.0:8000 -t src/frontend
@@ -106,13 +106,13 @@ php test_basic.php
 4. **Accede a la aplicación**
    ```
    🎮 Aplicación principal: 
-   http://127.0.0.1:8000/index.html
+   http://localhost:8080/index.html
    
    🧪 Tests interactivos:
-   http://127.0.0.1:8000/test.html
+   http://localhost:8080/test.html
    
-   📱 Si usas puerto 8080:
-   http://localhost:8080/index.html
+   📱 Si usas puerto 8000:
+   http://127.0.0.1:8000/index.html
    ```
 
 ## 🧪 Cómo lanzar los tests
@@ -128,10 +128,10 @@ php test_basic.php
 ### 🌐 Opción 2: Tests en navegador (Más visual)
 1. Asegúrate de que el servidor esté corriendo:
    ```bash
-   php -S 127.0.0.1:8000 -t src/frontend
-   # O si hay problemas: php -S localhost:8080 -t src/frontend
+   php -S localhost:8080 -t src/frontend
+   # O si hay problemas: php -S 127.0.0.1:8000 -t src/frontend
    ```
-2. Abre: `http://127.0.0.1:8000/test.html` (o `http://localhost:8080/test.html`)
+2. Abre: `http://localhost:8080/test.html` (o `http://127.0.0.1:8000/test.html`)
 3. Haz clic en los botones de test
 
 **Qué hace:** Tests interactivos con resultados en tiempo real y interfaz visual.
@@ -183,21 +183,21 @@ Todos los tests cubren:
 **Si el servidor no funciona:**
 1. **Error "connection closed" o "SSL request":**
    - Usa `http://` (NO `https://`)
-   - Prueba `127.0.0.1` en lugar de `localhost`
-   - Ejemplo: `http://127.0.0.1:8000/test.html`
+   - Prueba `localhost` en lugar de `127.0.0.1`
+   - Ejemplo: `http://localhost:8080/test.html`
 
 2. **Puerto ocupado:**
    ```bash
    # Cambiar puerto
-   php -S localhost:8080 -t src/frontend
    php -S localhost:3000 -t src/frontend
+   php -S localhost:9000 -t src/frontend
    ```
 
 3. **Problemas de DNS/localhost:**
    ```bash
    # Usar IP directa
    php -S 127.0.0.1:8000 -t src/frontend
-   php -S 0.0.0.0:8000 -t src/frontend
+   php -S 0.0.0.0:8080 -t src/frontend
    ```
 
 **Si los tests fallan:**
@@ -207,10 +207,10 @@ Todos los tests cubren:
 4. Para PHPUnit, instala dependencias con `composer install`
 
 **URLs que funcionan:**
-- ✅ `http://127.0.0.1:8000/index.html`
+- ✅ `http://localhost:8080/index.html`
 - ✅ `http://localhost:8080/test.html`
-- ❌ `https://localhost:8000` (NO usar HTTPS)
-- ❌ `localhost:8000` (Falta http://)
+- ❌ `https://localhost:8080` (NO usar HTTPS)
+- ❌ `localhost:8080` (Falta http://)
 
 ## 🌟 Características técnicas
 

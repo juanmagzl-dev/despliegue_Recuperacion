@@ -71,7 +71,7 @@
 
 2. **Ejecuta la aplicación**
    ```bash
-   php -S localhost:8000 -t src/frontend
+   php -S localhost:8080 -t src/frontend
    ```
 
 3. **Lanza los tests**
