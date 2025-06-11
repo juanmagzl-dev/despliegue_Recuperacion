@@ -62,6 +62,9 @@ class TestRunner {
         
         $coverage = $total > 0 ? round(($this->passed / $total) * 100, 1) : 0;
         echo "📈 Coverage: $coverage%\n";
+        
+        // Return appropriate exit code
+        return $this->failed === 0 ? 0 : 1;
     }
     
     private function countMines($map) {
@@ -217,4 +220,5 @@ class TestRunner {
 }
 
 $runner = new TestRunner();
-$runner->runAllTests(); 
+$exitCode = $runner->runAllTests();
+exit($exitCode); 

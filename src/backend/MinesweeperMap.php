@@ -2,6 +2,9 @@
 
 namespace Minesweeper;
 
+use Exception;
+use SimpleXMLElement;
+
 class MinesweeperMap {
     private $rows;
     private $cols;

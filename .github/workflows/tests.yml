@@ -32,11 +32,14 @@ jobs:
         fi
     
     - name: 🧪 Run custom tests
-      run: php tests/run_tests.php
+      run: |
+        cd tests
+        php run_tests.php
     
     - name: 🏗️ Test PHP syntax
       run: |
         find src -name "*.php" -exec php -l {} \;
+        find tests -name "*.php" -exec php -l {} \;
     
     - name: 📊 Run PHPUnit (if available)
       run: |
