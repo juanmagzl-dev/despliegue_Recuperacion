@@ -263,5 +263,3 @@ Para producción:
 4. Configurar virtual host apuntando a `src/frontend/`
 
 ---
-
-**Desarrollado con ❤️ para el curso de Despliegue - 2º DAW** 
