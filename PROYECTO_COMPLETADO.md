@@ -100,5 +100,3 @@
 - Manejo de errores completo
 - Código limpio y documentado
 - Compatible con dispositivos móviles
-
-¡Proyecto completado exitosamente! 🎉 
